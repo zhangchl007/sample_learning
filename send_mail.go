@@ -7,10 +7,10 @@ import (
 
 var (
     // variable
-    from ="wang.coco@gmail.com"
-    pass ="E3ik8824"
-    to =[]string{"zhang.arthur@gmail.com"}
-    msg =[]byte("To: zhang.arthur@gmail.com\r\n" +
+    from ="xxx.coco@gmail.com"
+    pass ="xxxx"
+    to =[]string{"zhang.xxx@gmail.com"}
+    msg =[]byte("To: zhang.xxx@gmail.com\r\n" +
                  "Subject: discount Gophers!\r\n" +
                  "\r\n" +
                  "This is the email body.\r\n")

@@ -22,7 +22,7 @@ func main() {
     if len(os.Args) == 1 {
         cns :=Getcontextns()
         fmt.Printf("The Current Namespace is %s\n",cns)
-	}else if len(os.Args) == 2 || os.Args[1] =="-h" {
+	}else if len(os.Args) == 2 {
         fmt.Println("switchns               # Get the current namespace!")
         fmt.Println("switchns -n namespace  # switch the namespace in k8s!")
     }else {

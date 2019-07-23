@@ -2,17 +2,54 @@ package main
 
 import (
     "flag"
-    "bufio"
-    "regexp"
     "fmt"
     "os"
+    "io/ioutil"
     "path/filepath"
     "log"
-
+    yaml "gopkg.in/yaml.v2"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     "k8s.io/client-go/kubernetes"
     "k8s.io/client-go/tools/clientcmd"
 )
+
+// kubeconfig struct
+type Data struct {
+  Apiv1 string `yaml:"apiVersion"`
+  Clusters []Clusters `yaml:"clusters"`
+  Contexts []Contexts `yaml:"contexts"`
+  Currentctx string `yaml:"current-context"`
+  Kind string `yaml:"kind"`
+  Preferences Preferences `yaml:"preferences"`
+  Users []Users `yaml:"users"`
+}
+type Clusters struct {
+  Cluster Cluster `yaml:"cluster"`
+  Name  string `yaml:"name"`
+}
+type Cluster struct {
+  CertificateAuthorityData string `yaml:"certificate-authority-data,omitempty"`
+  Server  string `yaml:"server"`
+}
+type Users struct {
+  Name  string `yaml:"name"`
+  Utoken Utoken `yaml:"user"`
+}
+type Utoken struct {
+  Token string `yaml:"token"`
+}
+type Contexts struct {
+  Context Context `yaml:"context"`
+  Name    string  `yaml:"name"`
+}
+type Context struct {
+  Cluster string `yaml:"cluster"`
+  Namespace  string `yaml:"namespace"`
+  User  string `yaml:"user"`
+}
+type Preferences struct {
+    Colors bool `yaml:"colors,omitempty"`
+}
 
 func main() {
     var tmpfile string
@@ -61,6 +98,7 @@ func Checkallns(name, tmpfile string,s []string)[]string{
    }
     // uses the current context in kubeconfig
     config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+
     if err != nil {
         panic(err.Error())
     }
@@ -73,8 +111,7 @@ func Checkallns(name, tmpfile string,s []string)[]string{
     if err != nil {
         log.Fatalln("failed to get Namespaces:", err)
     }
-   // fmt.Printf("The current Namespaces is ")
-
+   // Check if the namespace exists in Kubernetes
     for _, ns := range allns.Items {
         m := ns.GetName()
         s =append(s, m)
@@ -100,54 +137,66 @@ func Getcontextns() string{
       if err != nil {
          panic(err)
       }
+    // restconfig := kubecfg.ConfigAccess()
+    //fmt.Println(restconfig)
      return cns
 }
 
 func Setcontextns(filename, name, tmpfile string) {
-    //tmpfile := "/tmp/a.txt"
-    file, err := os.Open(filename)
+
+   txtlines, err := ioutil.ReadFile(filename)
+   if err != nil {
+     panic(err)
+   }
+
+// struc Unmasrshal
+   var t Data
+   err = yaml.Unmarshal(txtlines, &t)
+   if err != nil {
+     panic(err)
+   }
+// decode yaml file , then change namespace in the current context
+   cls :=  t.Currentctx
+   allcls := t.Contexts
+   for k, v := range allcls {
+       if v.Name == cls {
+           p := &v.Context
+           p.Setns(name)
+           allcls[k] = v
+       }
+   }
+// encode yaml again
+   d, err := yaml.Marshal(&t)
+   if err != nil {
+      log.Fatalf("error: %v", err)
+   }
+// write yaml to tmpfile and overwrite the kubeconfig file
+   WriteToFile(tmpfile, d)
+   move(tmpfile, filename)
+   fmt.Printf("The current namespace is:  %s\n", name)
+}
+// generate the tempfile for kubeconfig
+func WriteToFile(f string ,d []byte)  {
+    err := ioutil.WriteFile(f, d, 0644)
 	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
+		log.Fatal(err)
 	}
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var txtlines []string
-
-	for scanner.Scan() {
-		txtlines = append(txtlines, scanner.Text())
-	}
-
-	file.Close()
-
-	for _, line := range txtlines {
-        re := regexp.MustCompile(`namespace: (\w+)`)
-        if fields :=re.FindStringSubmatch(line); fields != nil {
-            str := "namespace: " + name
-            line = re.ReplaceAllString(line, str)
-        }
-    //  fmt.Println(line)
-      WriteToFile(tmpfile, line)
-    }
-    move(tmpfile, filename)
-    fmt.Printf("Successfully switch the namespaces: %s!\n",name)
 }
 
-func WriteToFile(filename, line string)  {
-    f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-    if err != nil {
-     	log.Println(err)
-    }
-    defer f.Close()
-    //fmt.Println(line)
-    if _, err := f.WriteString(line + "\n"); err != nil {
-    	log.Println(err)
-    }
-}
-
+//replace kubeconfig file
 func move(from,to string) {
 	err := os.Rename(from, to)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+//change the property for construct
+func (ctx *Context) Setns(name string) string{
+    if len(ctx.Namespace) > 0 {
+        ctx.Namespace = name
+    }else {
+        fmt.Println("namespaces is ")
+    }
+   return ctx.Namespace
 }

@@ -191,7 +191,7 @@ func move(from,to string) {
 	}
 }
 
-//change the property for construct
+//change the namespace property for Context struct
 func (ctx *Context) Setns(name string) string{
     if len(ctx.Namespace) > 0 {
         ctx.Namespace = name

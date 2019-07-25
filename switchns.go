@@ -37,6 +37,8 @@ type Users struct {
 }
 type Utoken struct {
   Token string `yaml:"token"`
+  Cscertdata string `yaml:"client-certificate-data"`
+  Cskeydata string `yaml:"client-key-data"`
 }
 type Contexts struct {
   Context Context `yaml:"context"`

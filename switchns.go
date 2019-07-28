@@ -54,9 +54,8 @@ type Preferences struct {
 }
 
 func main() {
-    var tmpfile string
     var s []string
-    tmpfile = "/tmp/a.txt"
+    tmpfile := "/tmp/a.txt"
 
     if len(os.Args) == 1 {
         cns :=Getcontextns()
@@ -82,14 +81,12 @@ func homeDir() string {
 
 func Checkallns(name, tmpfile string,s []string)[]string{
     var kubeconfig *string
-    var fpath string
     i := 1
 
     flag.StringVar(&name, "n", "", "change the namespace in current context")
 
     if home := homeDir(); home != "" {
     kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-    fpath = filepath.Join(home, ".kube", "config")
     } else {
          kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
     }
@@ -122,7 +119,7 @@ func Checkallns(name, tmpfile string,s []string)[]string{
         }
     }
     if i == 0 {
-            Setcontextns(fpath, name, tmpfile)
+            Setcontextns(*kubeconfig, name, tmpfile)
     }else {
         fmt.Println("The kubernetes namespaces doesn't exists!")
     }
@@ -175,7 +172,7 @@ func Setcontextns(filename, name, tmpfile string) {
 // write yaml to tmpfile and overwrite the kubeconfig file
    WriteToFile(tmpfile, d)
    move(tmpfile, filename)
-   fmt.Printf("The current namespace is:  %s\n", name)
+   fmt.Printf("Successfully switch the namespaces: %s\n", name)
 }
 // generate the tempfile for kubeconfig
 func WriteToFile(f string ,d []byte)  {

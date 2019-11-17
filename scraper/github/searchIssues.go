@@ -9,6 +9,7 @@ import (
 )
 func SearchIssues(terms []string) (*IssuesSearchResult,error) {
     q := url.QueryEscape(strings.Join(terms, " "))
+    fmt.Println(IssuesURL + "?q" +q)
     resp, err := http.Get(IssuesURL + "?q=" + q)
     if err != nil {
         return nil, err

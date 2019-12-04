@@ -1,5 +1,7 @@
 Golang Practice 
 
-gpol learning 
+gopl learning 
 
 kuberntes development learning 
+
+just keep going

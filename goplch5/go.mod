@@ -1,4 +1,4 @@
-module sample_learning/gpolch5
+module samplelearning.com/goplch5
 
 go 1.13
 

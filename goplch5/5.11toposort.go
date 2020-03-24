@@ -22,6 +22,15 @@ var prereqs = map[string][]string{
     "programming languages": {"data structures", "computer organization"},
 }
 
+func index(k string, s []string) {
+    for _, v := range s {
+        if k == v {
+            p := []string{k}
+            return &p
+        }
+    }
+}
+
 func main(){
     for i, course := range topoSort(prereqs) {
         fmt.Printf("%d:\t%s\n", i+1, course)
@@ -31,8 +40,9 @@ func main(){
 func topoSort(m map[string][]string) []string{
     var order []string
     seen := make(map[string]bool)
-    var visitAll func(items []string)
-    visitAll = func(items []string) {
+    var visitAll func index(k string, s []string)
+    visitAll = func index(k string, s []string) {
+
         for _, item := range items {
             if !seen[item] {
                 seen[item] = true

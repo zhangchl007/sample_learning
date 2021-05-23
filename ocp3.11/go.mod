@@ -3,6 +3,7 @@ module ocp3.11
 go 1.14
 
 require (
+	github.com/go-delve/delve v1.4.1 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/openshift/client-go v0.0.0-20200116152001-92a2713fa240
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect

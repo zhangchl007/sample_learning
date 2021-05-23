@@ -42,12 +42,11 @@ func main() {
                 panic(err)
        }
 
-        fmt.Printf("The DeploymentConfig: %s: had been deleted in namespace %s:\n", dcLabelValue,namespace)
-
         err = appsClient.DeploymentConfigs(namespace).DeleteCollection(&metav1.DeleteOptions{}, listdcOptions)
         if err != nil {
                 panic(err)
+        }else {
+               fmt.Printf("The DeploymentConfig: %s: had been deleted in namespace %s:\n", dcLabelValue,namespace)
         }
-
 
 }

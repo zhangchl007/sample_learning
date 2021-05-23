@@ -4,15 +4,12 @@ import (
 )
 
 func main() {
-    fmt.Println(sum())
-    fmt.Println(sum(3))
-    fmt.Println(sum(1, 3, 4, 5))
+
+    fmt.Printf("%T\n", f) // "func(...int)"
+    fmt.Printf("%T\n", g) // "func([]int)")
 
 }
-func sum(vals ...int) int{
-    total := 0
-    for _, val := range vals{
-        total += val
-    }
-    return total
-}
+func f(...int) {}
+func g([]int) {}
+
+

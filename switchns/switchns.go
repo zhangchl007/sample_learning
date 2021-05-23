@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "fmt"
+    "context"
     "os"
     "io/ioutil"
     "path/filepath"
@@ -106,7 +107,7 @@ func Checkallns(name, tmpfile string,s []string)[]string{
     if err != nil {
         panic(err.Error())
     }
-    allns, err := clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+    allns, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
     if err != nil {
         log.Fatalln("failed to get Namespaces:", err)
     }

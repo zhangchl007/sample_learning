@@ -1,26 +1,18 @@
 package main
-import (
-    "fmt"
-    "os"
-    "golang.org/x/net/html"
-)
+
+import "os"
 
 func main() {
-    doc, err := html.Parse(os.Stdin)
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "outline1: %v\n", err)
-        os.Exit(1)
+    var rmdirs []func()
+    for _, d := range tempDirs() {
+        dir :=d
+        os.MkdirAll(dir,0755)
+        rmdirs= append(rmdirs,func(){
+            os.RemoveAll(dir)
+        })
     }
-    outline(nil, doc)
-}
-
-func outline(stack []string, n *html.Node) {
-    if n.Type == html.ElementNode {
-        stack = append(stack, n.Data) // push tag
-        fmt.Println(stack)
-    }
-    for c := n.FirstChild; c != nil; c = c.NextSibling {
-        outline(stack, c)
+    for _, rmdir := range rmdirs {
+        rmdir()
     }
 }
 

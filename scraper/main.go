@@ -7,7 +7,7 @@ import(
     "bufio"
     "strings"
     "strconv"
-    "sample_learning/scraper/github"
+    "samplelearning.com/scraper/github"
 )
 
 

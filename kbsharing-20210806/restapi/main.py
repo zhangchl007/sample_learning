@@ -30,17 +30,69 @@ def api_return(url):
    return s
 
 def list_pods():
-        url = "{}/api/v1/namespaces/{}/pods".format(
+    url = "{}/api/v1/namespaces/{}/pods".format(
             base_url, namespace)
-        response = api_return(url)
-        # Extract the Pod name from the list
-        pods = [p['metadata']['name'] for p in response['items']]
-        # For each Pod, issue an HTTP DELETE request
-        print("the pods list is:")
-        for p in pods:
-            print("%s" % p)
+    response = api_return(url)
+    # Extract the Pod name from the list
+    pods = [p['metadata']['name'] for p in response['items']]
+    # For each Pod, issue an HTTP DELETE request
+    print("the pods list is:")
+    for p in pods:
+        print("%s" % p)
+def update_pods():
+    name = 'demo-deployment'
+    jsondata = {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "demo-deployment",
+        "namespace": "default",
+       },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+            "matchLabels": {
+                "app": "demo"
+            }
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "demo"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "image": "nginx:1.12",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "web",
+                        "ports": [
+                            {
+                                "containerPort": 80,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ]
+                    }
+                ]
+            }
+         }
+       }
+    }
+    url = "{}/apis/apps/v1/namespaces/{}/deployments/{}".format(
+       base_url, namespace, name)
+    print(url)
+    r = requests.put(url, headers=headers, verify=False, json=jsondata)
+    print(r.status_code)
+    if r.status_code == 200:
+        log.info("{} was updated successfully".format(name))
+    else:
+        log.error("Could not update {}".format(name))
+
 def main():
     list_pods()
+    update_pods()
 
 if __name__ == '__main__':
     main()

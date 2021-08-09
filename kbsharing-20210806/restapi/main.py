@@ -49,7 +49,7 @@ def update_pods():
         "namespace": "default",
        },
       "spec": {
-        "replicas": 1,
+        "replicas": 2,
         "selector": {
             "matchLabels": {
                 "app": "demo"
